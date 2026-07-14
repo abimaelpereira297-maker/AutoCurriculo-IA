@@ -1,0 +1,32 @@
+# Chrome
+perfil/
+perfil/chrome/
+
+# Banco de dados
+*.db
+
+# Planilhas
+*.xlsx
+
+# Logs
+logs/
+
+# Arquivos gerados
+curriculos/
+cartas/
+
+# Credenciais
+credentials.json
+
+# Cache do Python
+__pycache__/
+*.pyc
+
+# Ambiente virtual
+venv/
+
+# VS Code
+.vscode/
+
+# Arquivos temporários
+*.log
