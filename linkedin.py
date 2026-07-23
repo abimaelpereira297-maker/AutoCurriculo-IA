@@ -146,6 +146,179 @@ def buscar_vagas():
         )
 
         print("\nCarregando vagas...\n")
+# ==========================================================
+# ROLAGEM AUTOMÁTICA
+# ==========================================================
+
+        ultimo_total = 0
+
+        for scroll in range(30):
+
+            page.mouse.wheel(0, 5000)
+
+            page.wait_for_timeout(2000)
+
+            cards = page.locator(
+                "div.job-card-list__entity-lockup"
+            )
+
+            total = cards.count()
+
+            print(
+                f"Rolagem {scroll + 1}: {total} vagas carregadas"
+            )
+
+            if total == ultimo_total:
+                break
+
+            ultimo_total = total
+
+        print(f"\nTotal encontrado: {ultimo_total}")
+
+        cards = page.locator(
+            "div.job-card-list__entity-lockup"
+        )
+
+        total = cards.count()
+
+        print("\nIniciando coleta...\n")
+        ultimo_total = 0
+
+        for scroll in range(30):
+
+            page.mouse.wheel(0, 5000)
+
+            page.wait_for_timeout(2000)
+
+            cards = page.locator(
+                "div.job-card-list__entity-lockup"
+            )
+
+            total = cards.count()
+
+            print(f"Rolagem {scroll + 1}: {total} vagas carregadas")
+
+            if total == ultimo_total:
+                break
+
+            ultimo_total = total
+
+        print(f"\nTotal encontrado: {ultimo_total}")
+
+        cards = page.locator(
+            "div.job-card-list__entity-lockup"
+        )
+
+        total = cards.count()
+
+        print("\nIniciando coleta...\n")
+
+        # ==========================================================
+        # COLETA DAS VAGAS
+        # ==========================================================
+
+        for i in range(min(total, MAX_VAGAS)):
+
+            try:
+
+                card = cards.nth(i)
+
+                card.scroll_into_view_if_needed()
+
+                page.wait_for_timeout(800)
+
+                card.click()
+
+                page.wait_for_timeout(3000)
+
+                titulo = obter_texto(
+                    page,
+                    ".job-details-jobs-unified-top-card__job-title h1"
+                )
+
+                empresa = obter_texto(
+                    page,
+                    ".job-details-jobs-unified-top-card__company-name a"
+                )
+
+                local = obter_texto(
+                    page,
+                    ".job-details-jobs-unified-top-card__primary-description-container span",
+                    primeiro=True
+                )
+
+                descricao = obter_texto(
+                    page,
+                    "#job-details"
+                )
+
+                link = page.url
+
+                if not titulo:
+                    continue
+
+                if link in links_vistos:
+                    continue
+
+                links_vistos.add(link)
+
+                score, palavras = calcular_score(descricao)
+
+                data = datetime.now().strftime("%d/%m/%Y %H:%M")
+
+                # ===============================
+                # IA
+                # ===============================
+
+                score_ia, analise_ia = analisar_vaga(descricao)
+
+                print(f"🤖 Score IA: {score_ia}")
+
+                salvar_vaga(
+                    link,
+                    titulo,
+                    empresa,
+                    local,
+                    descricao,
+                    score,
+                    score_ia,
+                    analise_ia,
+                    data
+                )
+
+                vagas_coletadas.append({
+
+                    "titulo": titulo,
+                    "empresa": empresa,
+                    "local": local,
+                    "descricao": descricao,
+                    "link": link,
+                    "score": score,
+                    "score_ia": score_ia,
+                    "analise_ia": analise_ia,
+                    "palavras": palavras,
+                    "data": data
+
+                })
+
+                print("\n" + "=" * 70)
+                print(f"Vaga {i + 1}")
+                print("=" * 70)
+                print("Título :", titulo)
+                print("Empresa:", empresa)
+                print("Local  :", local)
+                print("Score Palavras:", score)
+                print("Score IA:", score_ia)
+                print("Palavras:", ", ".join(palavras) if palavras else "Nenhuma")
+                print("Descrição:")
+                print(descricao[:300] + "..." if len(descricao) > 300 else descricao)
+                print("Link:", link)
+
+            except Exception as e:
+
+                print(f"\nErro ao processar vaga {i + 1}: {e}")
+
+                continue
         ultimo_total = 0
 
         for scroll in range(30):
@@ -284,7 +457,6 @@ def buscar_vagas():
                 print(f"\nErro ao processar vaga {i + 1}: {e}")
 
                 continue
-
         # ==========================================================
         # FIM DA COLETA
         # ==========================================================
