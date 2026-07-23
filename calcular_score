@@ -1,0 +1,30 @@
+def calcular_score(titulo, empresa, localizacao):
+
+    texto = f"{titulo} {empresa} {localizacao}".lower()
+
+    score = 0
+
+    positivos = {
+        "qualidade": 3,
+        "auditoria": 3,
+        "inspeção": 3,
+        "assistente": 2,
+        "analista": 2,
+        "controle": 2
+    }
+
+    negativos = {
+        "estágio": -5,
+        "trainee": -4,
+        "júnior sem experiência": -3
+    }
+
+    for k, v in positivos.items():
+        if k in texto:
+            score += v
+
+    for k, v in negativos.items():
+        if k in texto:
+            score += v
+
+    return score

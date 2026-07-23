@@ -5,7 +5,6 @@ MÓDULO OLLAMA
 ==========================================================
 """
 
-import json
 import requests
 
 from config import (
@@ -15,33 +14,36 @@ from config import (
 )
 
 
+# ==========================================================
+# ANALISA UMA VAGA
+# ==========================================================
+
 def analisar_vaga(descricao):
 
+    # Limita o tamanho da descrição para acelerar a IA
+    descricao = descricao[:1800]
+
     prompt = f"""
-Você é um especialista em recrutamento.
+Analise esta vaga para um profissional de Gestão da Qualidade.
 
-Analise a vaga abaixo.
-
-Dê uma nota de 0 a 100 para compatibilidade com um profissional de Qualidade.
-
-Considere:
+Avalie a compatibilidade considerando conhecimentos em:
 
 - Assistente de Qualidade
 - Analista de Qualidade
-- ISO
-- Auditoria
+- ISO 9001
+- Auditorias
 - Inspeção
 - Controle de Qualidade
 - Processos
 - Melhoria Contínua
 - Ferramentas da Qualidade
 
-Responda SOMENTE neste formato:
+Responda EXATAMENTE neste formato:
 
-NOTA: xx
+NOTA: XX
 
 JUSTIFICATIVA:
-texto...
+Até 3 linhas.
 
 VAGA:
 
@@ -53,7 +55,8 @@ VAGA:
         "prompt": prompt,
         "stream": False,
         "options": {
-            "temperature": TEMPERATURE
+            "temperature": TEMPERATURE,
+            "num_predict": 120
         }
     }
 
@@ -65,11 +68,14 @@ VAGA:
             timeout=300
         )
 
-        resposta.raise_for_status()
+        if resposta.status_code != 200:
+            print(f"Status: {resposta.status_code}")
+            print(f"Resposta: {resposta.text}")
+            return 0, "Erro na IA"
 
         dados = resposta.json()
 
-        texto = dados["response"]
+        texto = dados.get("response", "")
 
         nota = 0
 
@@ -103,23 +109,20 @@ if __name__ == "__main__":
     descricao = """
 Empresa procura Assistente de Qualidade.
 
-Conhecimentos em ISO 9001,
-auditorias internas,
-controle de qualidade,
-melhoria contínua,
-5S e indicadores.
+Conhecimentos em:
+
+- ISO 9001
+- Auditorias internas
+- Controle de qualidade
+- Indicadores
+- Melhoria contínua
+- 5S
 """
 
     nota, resposta = analisar_vaga(descricao)
 
-    print()
-
-    print("=" * 60)
-
+    print("\n" + "=" * 60)
     print("NOTA:", nota)
-
-    print()
-
+    print("=" * 60)
     print(resposta)
-
     print("=" * 60)

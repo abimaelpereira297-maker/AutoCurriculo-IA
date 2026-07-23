@@ -1,13 +1,13 @@
 import requests
 
-BOT_TOKEN = "SEU_TOKEN"
+BOT_TOKEN = "SEU_TOKEN_AQUI"
 CHAT_ID = "SEU_CHAT_ID"
 
 
 def enviar_alerta(vaga):
 
     msg = f"""
-🚨 VAGA BOA ENCONTRADA
+🚨 NOVA VAGA BOA
 
 📌 {vaga['titulo']}
 🏢 {vaga['empresa']}

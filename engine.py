@@ -3,22 +3,24 @@
 AUTOCURRICULO IA
 ENGINE
 ==========================================================
-Motor responsável por classificar e priorizar vagas.
 """
 
 import logging
-
 
 # ==========================================================
 # SCORE FINAL
 # ==========================================================
 
 def calcular_score_final(score_palavras, score_ia):
-    """
-    Combina o score por palavras com o score da IA.
-    """
 
-    return round((score_ia * 0.8) + (score_palavras * 0.2))
+    score_palavras = min(score_palavras * 5, 100)
+
+    score_final = round(
+        (score_ia * 0.9) +
+        (score_palavras * 0.1)
+    )
+
+    return score_final
 
 
 # ==========================================================
@@ -27,13 +29,13 @@ def calcular_score_final(score_palavras, score_ia):
 
 def definir_prioridade(score_final):
 
-    if score_final >= 80:
+    if score_final >= 85:
         return "ALTA"
 
-    if score_final >= 60:
+    elif score_final >= 70:
         return "MEDIA"
 
-    if score_final >= 40:
+    elif score_final >= 50:
         return "BAIXA"
 
     return "DESCARTAR"
@@ -47,6 +49,8 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s"
 )
+
+
 # ==========================================================
 # PROCESSA TODAS AS VAGAS
 # ==========================================================
@@ -94,19 +98,13 @@ def processar_vagas(vagas):
                 f"Erro ao processar vaga: {e}"
             )
 
-    # ======================================================
-    # ORDENA DO MAIOR SCORE PARA O MENOR
-    # ======================================================
-
     vagas_processadas.sort(
         key=lambda x: x["score_final"],
         reverse=True
     )
 
     logging.info("=" * 60)
-    logging.info(
-        f"{len(vagas_processadas)} vagas classificadas."
-    )
+    logging.info(f"{len(vagas_processadas)} vagas classificadas.")
     logging.info("=" * 60)
 
     return vagas_processadas
